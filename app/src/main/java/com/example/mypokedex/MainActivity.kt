@@ -1,9 +1,16 @@
 package com.example.mypokedex
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recView: RecyclerView
@@ -15,9 +22,31 @@ class MainActivity : AppCompatActivity() {
         recView= findViewById(R.id.Rec_Poke)
         recView.layoutManager=LinearLayoutManager(this)
         val dataSet = getListadoPokemon()
-        adapter=Adapter()
+        adapter=Adapter(applicationContext)
         adapter.submitList(dataSet)
         recView.adapter=adapter
+        adapter.onItemClickListener={
+            val toast = Toast(this)
+            val layToast = LinearLayout(this)
+            layToast.orientation = LinearLayout.VERTICAL
+            val textV=TextView(this)
+            textV.text=it.name
+
+            val img = ImageView(this)
+            Glide.with(this)
+                .load(it.url)
+                .into(img)
+
+            layToast.addView(textV)
+            layToast.addView(img)
+            toast.setView(layToast)
+            toast.show()
+
+            val intent= Intent(this,DetailActivity::class.java)
+            intent.putExtra("name",it.name)
+            intent.putExtra("url",it.url)
+            startActivity(intent)
+        }
     }
 
     private fun getListadoPokemon(): MutableList<Pokemon>? {
